@@ -17,37 +17,59 @@ var ground = new GameObject();
 var wall = new GameObject();
 var level = new GameObject();
 
-var translatedY = c.height+ground.h-ground.y;
+const carColors = [
+    "#e55036",
+    "#46ac13",
+    "#417caa",
+    "#8cab25",
+    "#ac8752",
+    "#a69bb2",
+    "#9bb2a5",
+]
+
+function randomCarColor() {
+    let randNum = rand(0, carColors.length - 1)
+    let color = carColors[randNum]
+    carColors.splice(randNum, 1)
+    return color
+}
+
+var translatedY = c.height + ground.h - ground.y;
 var platformsData = [
-    {
-        w: 200,
-        h: 34,
-        x: 200,
-        y: translatedY-(180*1),
-        color: `tan`,
-        world: level,
-    },
-    {
-        w: 200,
-        h: 34,
-        x: 200,
-        y: translatedY-(180*2),
-        color: `tan`,
-        world: level,
-    },
-    {
-        w: 200,
-        h: 34,
-        x: 200,
-        y: translatedY-(180*3),
-        color: `tan`,
-        world: level,
-    },
+    /* {
+         w: 200,
+         h: 34,
+         x: 200,
+         y: translatedY-(180*1),
+         color: `tan`,
+         world: level,
+     },
+     {
+         w: 200,
+         h: 34,
+         x: 200,
+         y: translatedY-(180*2),
+         color: `tan`,
+         world: level,
+     },
+     {
+         w: 200,
+         h: 34,
+         x: 200,
+         y: translatedY-(180*3),
+         color: `tan`,
+         world: level,
+     },*/
 
 
 ];
 
 var platforms = [];
+var trainCars = [];
+
+var numCars = 3
+var carSpacing = 25
+var trainSpeed = 50
 
 for (let i = 0; i < platformsData.length; i++) {
     var platform = new GameObject();
@@ -65,24 +87,22 @@ for (let i = 0; i < platformsData.length; i++) {
 function init() {
     state = menu
 
-    avatar.color = `green`;
+    avatar.color = `blue`;
 
     level.x = 0;
     level.y = 0;
 
-    ground.color = `brown`;
-    ground.w = c.width;
-    ground.h = c.height * .25;
-    ground.y = c.height - ground.h / 2;
-    ground.world = level
-
-
-
-    wall.h = 200;
-    wall.w = 34;
-    wall.color = `purple`
-    wall.x = 700;
-    wall.world = level
+    for (let i = 0; i < numCars; i++) {
+        let car = new GameObject();
+        //car.color = `black`;
+        car.w = (c.width / 2);
+        car.h = c.height * .25;
+        car.x = ((car.w) / 2) + ((carSpacing) * i) + (((car.w)) * i)
+        car.y = c.height - (car.h / 2)
+        car.world = level
+        car.color = randomCarColor()
+        trainCars[i] = car
+    }
 
 }
 
@@ -123,12 +143,16 @@ function game() {
     //used to move the level. 
     var offset = { x: avatar.vx, y: avatar.vy }
 
-    while (ground.isOverPoint(avatar.bottomL())) {
-        avatar.vy = 0;
-        avatar.y--;
-        offset.y--;
-        avatar.canJump = true;
+    for (let i = 0; i < trainCars.length; i++) {
+        let ground = trainCars[i]
+        while (ground.isOverPoint(avatar.bottomL())) {
+            avatar.vy = 0;
+            avatar.y--;
+            offset.y--;
+            avatar.canJump = true;
+        }
     }
+
 
     for (let i = 0; i < platforms.length; i++) {
         let platform = platforms[i]
@@ -142,11 +166,11 @@ function game() {
 
     }
 
-    while (wall.isOverPoint(avatar.right()) && avatar.vx >= 0) {
-        avatar.vx = 0;
-        avatar.x--;
-        offset.x--;
-    }
+    /* while (wall.isOverPoint(avatar.right()) && avatar.vx >= 0) {
+         avatar.vx = 0;
+         avatar.x--;
+         offset.x--;
+     }*/
 
     /*-------Level movement threshold----*/
     //if(avatar.x > 500 || avatar.x < 300)
@@ -159,8 +183,8 @@ function game() {
     //}
 
     //----- Camera Code -----------
-    var dx = c.width / 2 - avatar.x
-    var dy = c.height / 2 - avatar.y
+    var dx = -trainSpeed//c.width / 2 - avatar.x
+    var dy = 0//c.height / 2 - avatar.y
 
     level.x += dx * .05;
     avatar.x += dx * .05;
@@ -169,8 +193,21 @@ function game() {
     //----------------------------/
 
 
-    ground.render();
-    wall.render();
+
+    for (let i = 0; i < trainCars.length; i++) {
+        let car = trainCars[i]
+
+        let end = car.x + (car.w / 2)
+        if (end + level.x < 0) {
+            let spot = (((car.w) + carSpacing) * numCars)
+            car.x += spot
+            carColors.push(car.color)
+            car.color = randomCarColor()
+        }
+
+        car.render();
+    }
+    //wall.render();
     avatar.render();
 
 }

@@ -3,7 +3,7 @@
 //random number generator
 function rand(_low, _high)
 {
-    return Math.random()*(_high - _low) + _low;
+    return Math.floor(Math.random()*(_high - _low) + _low);
 }
 //Converts degrees to radians
 function radians(_deg)

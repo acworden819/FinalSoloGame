@@ -4,18 +4,18 @@ class GameObject
     {     
     /*Object properties (or attributes)*/
     //object position
-     this.x=c.width/2;
+     this.x=c.width/4;
      this.y=c.height/2;
      //object angle
      this.angle = 0;
      //object dimensions
-     this.w=100;
-     this.h=100;
+     this.w=25;
+     this.h=50;
      //object velocity
      this.vx=0;
      this.vy=0;
     //object color
-     this.color = `hotpink`
+     this.color = `blue`
     //jump boolean
     this.canJump = false;
     this.world = {x:0, y:0}
