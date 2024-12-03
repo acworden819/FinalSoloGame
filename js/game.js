@@ -27,6 +27,7 @@ const carColors = [
     "#9bb2a5",
 ]
 
+ctx.globalAlpha = 1
 
 
 function randomCarColor() {
@@ -68,10 +69,19 @@ var platformsData = [
 
 var platforms = [];
 var trainCars = [];
+var bushesArray = [];
+var mountainArray1 = [];
+var mountainArray2 = [];
+
 
 var numCars = 3
 var carSpacing = 25
-var trainSpeed = 50
+var maxTrainSpeed = 90
+
+let playerSpeed = 1
+let trainSpeed = 0
+
+
 
 for (let i = 0; i < platformsData.length; i++) {
     var platform = new GameObject();
@@ -99,12 +109,34 @@ function init() {
         //car.color = `black`;
         car.w = (c.width / 2);
         car.h = c.height * .25;
-        console.log(car.w, car.h)
         car.x = ((car.w) / 2) + ((carSpacing) * i) + (((car.w)) * i)
-        car.y = c.height - (car.h / 2)
+        car.y = c.height - (car.h / 2) + 20
         car.world = level
         car.containerId = randomCarColor()
         trainCars[i] = car
+    }
+
+    for (let i = 0; i < 2; i++) {
+        let bushes = new GameObject();
+        // bushes.color = `black`;
+        bushes.w = (c.width * 2);
+        bushes.h = 600;
+        bushes.x = ((bushes.w) / 2) + (((bushes.w)) * i)
+        bushes.y = 250 //c.height - (bushes.h / 2) + 20
+        bushes.world = level
+        //bushes.containerId = randomCarColor()
+        bushesArray[i] = bushes
+    }
+    for (let i = 0; i < 2; i++) {
+        let mountain = new GameObject();
+        // bushes.color = `black`;
+        mountain.w = (c.width * 2);
+        mountain.h = 400;
+        mountain.x = ((mountain.w) / 2) + ((((mountain.w)) * i))
+        mountain.y = 200 //c.height - (bushes.h / 2) + 20
+        mountain.world = level
+        //bushes.containerId = randomCarColor()
+        mountainArray1[i] = mountain
     }
 
 }
@@ -128,26 +160,32 @@ function lose() {
 
 function game() {
 
+    if (trainSpeed <= maxTrainSpeed) trainSpeed += .25;
 
     if (sp == true && avatar.canJump == true) {
         avatar.canJump = false;
         avatar.vy = -25;
     }
     if (a == true) {
-        avatar.vx += -1;
+        avatar.vx += -playerSpeed;
     }
     if (d == true) {
-        avatar.vx += 1;
+        avatar.vx += playerSpeed;
     }
-    if (ctrl == true && avatar.canJump){
-            avatar.h = 25
-            avatar.y += 25/2
-    }else{
-        avatar.h = 50
-    }
+
 
     avatar.vx *= .85;
     avatar.vy += 1.3;
+
+    if (ctrl == true && avatar.canJump) {
+        avatar.h = 25
+        avatar.y += 25 / 2
+        avatar.vx *= .7
+    } else {
+        avatar.h = 50
+        playerSpeed = 1
+    }
+
     avatar.move();
 
     //used to move the level. 
@@ -159,7 +197,7 @@ function game() {
             avatar.vy = 0;
             avatar.y--;
             offset.y--;
-             avatar.canJump = true;
+            avatar.canJump = true;
         }
     }
 
@@ -200,9 +238,37 @@ function game() {
     avatar.x += dx * .05;
     level.y += dy * .15;
     avatar.y += dy * .15;
+
     //----------------------------/
+    for (let i = 0; i < bushesArray.length; i++) {
+       // if (bushesArray[i]) {
 
 
+
+            let mtn1 = mountainArray1[i]
+            mtn1.x = -level.x //- trainSpeed - (mtn1.x/50)
+            console.log(level.x )
+
+            let mtn1End = mtn1.x + (mtn1.w / 2)
+            if (mtn1End + level.x < 0) {
+                let spot = (mtn1.w * mountainArray1.length)
+                mtn1.x += spot-1
+            }
+            mtn1.renderImage(document.getElementById("Mountain1"))
+
+
+            let bush = bushesArray[i]
+            bush.x -= trainSpeed / 150
+
+            let bushEnd = bush.x + (bush.w / 2)
+            if (bushEnd + level.x < 0) {
+                let spot = (bush.w * bushesArray.length)
+                bush.x += spot
+            }
+
+            bush.renderImage(document.getElementById("Bushes"))
+        //}
+    }
 
     for (let i = 0; i < trainCars.length; i++) {
         let car = trainCars[i]
@@ -215,8 +281,12 @@ function game() {
             car.containerId = randomCarColor()
         }
 
+
+
         car.renderImage(document.getElementById("Container" + String(car.containerId)));
     }
+
+
     //wall.render();
     avatar.render();
 
