@@ -19,6 +19,7 @@ class GameObject
     //jump boolean
     this.canJump = false;
     this.world = {x:0, y:0}
+    this.containerId = 0
 
      this.img = {
         src:document.querySelector(_id),
@@ -81,6 +82,15 @@ class GameObject
         ctx.restore();
     }
 
+    renderImage(image)
+    {
+        ctx.save();
+            ctx.translate(this.x+this.world.x, this.y+this.world.y)
+            ctx.rotate(this.angle*Math.PI/180)
+            ctx.drawImage(image, -this.w/2, -this.h/2, this.w, this.h)
+        ctx.restore();
+    }
+
     //Moves an object by adding it's velocity to it's position on each axis
     move()
     {
@@ -95,7 +105,7 @@ class GameObject
     }
     bottomL()
     {
-        return {x:this.x-this.w/2, y:this.y + this.h/2};
+        return {x:this.x-this.w/2, y:this.y + this.h/2 -2};
     }
     bottomR()
     {

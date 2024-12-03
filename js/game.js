@@ -27,11 +27,13 @@ const carColors = [
     "#9bb2a5",
 ]
 
+
+
 function randomCarColor() {
-    let randNum = rand(0, carColors.length - 1)
-    let color = carColors[randNum]
-    carColors.splice(randNum, 1)
-    return color
+    let randNum = rand(0, 5)
+    // let color = carColors[randNum]
+    //carColors.splice(randNum, 1)
+    return randNum
 }
 
 var translatedY = c.height + ground.h - ground.y;
@@ -97,10 +99,11 @@ function init() {
         //car.color = `black`;
         car.w = (c.width / 2);
         car.h = c.height * .25;
+        console.log(car.w, car.h)
         car.x = ((car.w) / 2) + ((carSpacing) * i) + (((car.w)) * i)
         car.y = c.height - (car.h / 2)
         car.world = level
-        car.color = randomCarColor()
+        car.containerId = randomCarColor()
         trainCars[i] = car
     }
 
@@ -124,16 +127,23 @@ function lose() {
 }
 
 function game() {
+
+
     if (sp == true && avatar.canJump == true) {
         avatar.canJump = false;
         avatar.vy = -25;
     }
-
     if (a == true) {
         avatar.vx += -1;
     }
     if (d == true) {
         avatar.vx += 1;
+    }
+    if (ctrl == true && avatar.canJump){
+            avatar.h = 25
+            avatar.y += 25/2
+    }else{
+        avatar.h = 50
     }
 
     avatar.vx *= .85;
@@ -149,7 +159,7 @@ function game() {
             avatar.vy = 0;
             avatar.y--;
             offset.y--;
-            avatar.canJump = true;
+             avatar.canJump = true;
         }
     }
 
@@ -160,7 +170,7 @@ function game() {
             avatar.vy = 0;
             avatar.y--;
             offset.y--;
-            avatar.canJump = true;
+            avatar.canJump = true
         }
         platform.render();
 
@@ -202,10 +212,10 @@ function game() {
             let spot = (((car.w) + carSpacing) * numCars)
             car.x += spot
             carColors.push(car.color)
-            car.color = randomCarColor()
+            car.containerId = randomCarColor()
         }
 
-        car.render();
+        car.renderImage(document.getElementById("Container" + String(car.containerId)));
     }
     //wall.render();
     avatar.render();
