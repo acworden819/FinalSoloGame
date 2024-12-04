@@ -80,7 +80,8 @@ var maxTrainSpeed = 90
 
 let playerSpeed = 1
 let trainSpeed = 0
-
+let mtnOffset = 0
+let spot = 0
 
 
 for (let i = 0; i < platformsData.length; i++) {
@@ -129,13 +130,11 @@ function init() {
     }
     for (let i = 0; i < 2; i++) {
         let mountain = new GameObject();
-        // bushes.color = `black`;
         mountain.w = (c.width * 2);
         mountain.h = 400;
         mountain.x = ((mountain.w) / 2) + ((((mountain.w)) * i))
-        mountain.y = 200 //c.height - (bushes.h / 2) + 20
+        mountain.y = 200//c.height - (bushes.h / 2) + 20
         mountain.world = level
-        //bushes.containerId = randomCarColor()
         mountainArray1[i] = mountain
     }
 
@@ -143,6 +142,7 @@ function init() {
 
 init();
 
+let done = false
 /*---------------Game Screens (states)----------------*/
 function menu() {
     if (clicked(button)) {
@@ -240,33 +240,57 @@ function game() {
     avatar.y += dy * .15;
 
     //----------------------------/
+
+    for (let i = 0; i < mountainArray1.length; i++) {
+        mtnOffset -= trainSpeed*.001
+        let mtn1 = mountainArray1[i]
+
+        let mtn1End = mtn1.x + level.x + (mtn1.w / 2)
+
+        mtn1.x = (spot) + (-level.x + mtnOffset + (mtn1.w * i))
+
+        if (i == 1) console.log()
+        if (mtn1End - mtn1.w < 0) {
+            if (i == 1 && !done) {
+                done = true
+                spot += (mtn1.w * (mountainArray1.length - 1))
+                console.log("hi")
+            }
+            if (i == 0) {
+            }
+            //mtn1.x += spot
+        } else {
+
+
+            done = false
+        }
+
+
+        /* let mtn2 = mountainArray2[i]
+         mtn2.x = -level.x + (mtnOffset/2)
+ 
+         let mtn2End = mtn2.x + (mtn2.w / 2)
+         if (mtn2End + level.x < 0) {
+             let spot = (mtn2.w * mountainArray2.length)
+             mtn2.x += spot-1
+         }*/
+
+        mtn1.renderImage(document.getElementById("Mountain1"))
+        // mtn2.renderImage(document.getElementById("Mountain1"))
+    }
     for (let i = 0; i < bushesArray.length; i++) {
-       // if (bushesArray[i]) {
+        // if (bushesArray[i]) {
 
+        let bush = bushesArray[i]
+        bush.x -= trainSpeed / 150
 
+        let bushEnd = bush.x + (bush.w / 2)
+        if (bushEnd + level.x < 0) {
+            let spot = (bush.w * bushesArray.length)
+            bush.x += spot
+        }
 
-            let mtn1 = mountainArray1[i]
-            mtn1.x = -level.x //- trainSpeed - (mtn1.x/50)
-            console.log(level.x )
-
-            let mtn1End = mtn1.x + (mtn1.w / 2)
-            if (mtn1End + level.x < 0) {
-                let spot = (mtn1.w * mountainArray1.length)
-                mtn1.x += spot-1
-            }
-            mtn1.renderImage(document.getElementById("Mountain1"))
-
-
-            let bush = bushesArray[i]
-            bush.x -= trainSpeed / 150
-
-            let bushEnd = bush.x + (bush.w / 2)
-            if (bushEnd + level.x < 0) {
-                let spot = (bush.w * bushesArray.length)
-                bush.x += spot
-            }
-
-            bush.renderImage(document.getElementById("Bushes"))
+        bush.renderImage(document.getElementById("Bushes"))
         //}
     }
 
