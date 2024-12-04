@@ -229,7 +229,8 @@ function game() {
     }
 
     if (avatar.bottomL().y > voidLevel) {
-        avatar.falling = true
+        avatar.falling = true;
+        avatar.canJump = false;
     } else {
        avatar.falling = false
     }
