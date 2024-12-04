@@ -5,11 +5,11 @@ class GameObject
     /*Object properties (or attributes)*/
     //object position
      this.x=c.width/4;
-     this.y=c.height/2;
+     this.y=300;
      //object angle
      this.angle = 0;
      //object dimensions
-     this.w=25;
+     this.w=20;
      this.h=50;
      //object velocity
      this.vx=0;
@@ -18,8 +18,10 @@ class GameObject
      this.color = `blue`
     //jump boolean
     this.canJump = false;
+    this.falling = false;
     this.world = {x:0, y:0}
     this.containerId = 0
+
 
      this.img = {
         src:document.querySelector(_id),
@@ -82,12 +84,14 @@ class GameObject
         ctx.restore();
     }
 
-    renderImage(image)
+    renderImage(image, reverse)
     {
         ctx.save();
             ctx.translate(this.x+this.world.x, this.y+this.world.y)
             ctx.rotate(this.angle*Math.PI/180)
+            if(reverse) ctx.scale(-1,1);
             ctx.drawImage(image, -this.w/2, -this.h/2, this.w, this.h)
+            ctx.scale(1,1)
         ctx.restore();
     }
 
@@ -105,11 +109,11 @@ class GameObject
     }
     bottomL()
     {
-        return {x:this.x-this.w/2, y:this.y + this.h/2 -2};
+        return {x:this.x-this.w/8, y:this.y + this.h/2};
     }
     bottomR()
     {
-        return {x:this.x+this.w/2, y:this.y + this.h/2};
+        return {x:this.x+this.w/8, y:this.y + this.h/2};
     }
     left()
     {
@@ -127,7 +131,7 @@ class GameObject
     overlaps(_obj)
     {
         if(
-            this.top().y+this.world.y < _obj.bottom().y+_obj.world.y &&
+            this.top().y+this.world.y < _obj.bottomL().y+_obj.world.y &&
             this.bottomL().y+this.world.y > _obj.top().y+_obj.world.y &&
             this.bottomR().y+this.world.y > _obj.top().y+_obj.world.y &&
             this.left().x+this.world.x < _obj.right().x+_obj.world.x &&

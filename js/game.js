@@ -72,16 +72,24 @@ var trainCars = [];
 var bushesArray = [];
 var mountainArray1 = [];
 var mountainArray2 = [];
+var signals = [];
 
 
 var numCars = 3
-var carSpacing = 25
-var maxTrainSpeed = 90
+var carSpacing = 30
+var maxTrainSpeed = 120
 
-let playerSpeed = 1
+let playerSpeed = (maxTrainSpeed) / 110
 let trainSpeed = 0
-let mtnOffset = 0
-let spot = 0
+let mtnOffset0 = 0
+let mtnOffset1 = 0
+let spot0 = 0
+let done0 = false
+let spot1 = 0
+let done1 = false
+let signalPasses = 0
+let signal = null
+let accel = 0
 
 
 for (let i = 0; i < platformsData.length; i++) {
@@ -131,18 +139,33 @@ function init() {
     for (let i = 0; i < 2; i++) {
         let mountain = new GameObject();
         mountain.w = (c.width * 2);
-        mountain.h = 400;
+        mountain.h = 300;
         mountain.x = ((mountain.w) / 2) + ((((mountain.w)) * i))
         mountain.y = 200//c.height - (bushes.h / 2) + 20
         mountain.world = level
         mountainArray1[i] = mountain
+
+        let mountain2 = new GameObject();
+        mountain2.w = (c.width * 2);
+        mountain2.h = 400;
+        mountain2.x = ((mountain2.w) / 2) + ((((mountain2.w)) * i))
+        mountain2.y = 200//c.height - (bushes.h / 2) + 20
+        mountain2.world = level
+        mountainArray2[i] = mountain2
     }
+
+    signal = new GameObject();
+    signal.color = "black"
+    signal.w = 18
+    signal.h = 150
+    signal.x = c.width
+    signal.y = c.height - (signal.h / 2)
+    signal.world = level
 
 }
 
 init();
 
-let done = false
 /*---------------Game Screens (states)----------------*/
 function menu() {
     if (clicked(button)) {
@@ -155,11 +178,12 @@ function win() {
 
 }
 function lose() {
-
+    console.log("you lose")
 }
 
 function game() {
 
+    accel = playerSpeed
     if (trainSpeed <= maxTrainSpeed) trainSpeed += .25;
 
     if (sp == true && avatar.canJump == true) {
@@ -167,10 +191,10 @@ function game() {
         avatar.vy = -25;
     }
     if (a == true) {
-        avatar.vx += -playerSpeed;
+        avatar.vx += -accel;
     }
     if (d == true) {
-        avatar.vx += playerSpeed;
+        avatar.vx += accel;
     }
 
 
@@ -183,17 +207,20 @@ function game() {
         avatar.vx *= .7
     } else {
         avatar.h = 50
-        playerSpeed = 1
+        accel = playerSpeed
     }
 
     avatar.move();
-
+    //avatar.canJump = false
     //used to move the level. 
     var offset = { x: avatar.vx, y: avatar.vy }
-
+    
+    let carOffset = trainCars[1].y-c.height + (trainCars[1].h/2)
+    let voidLevel = c.height-(trainCars[1].h) + carOffset + 2
+    console.log(avatar.falling)
     for (let i = 0; i < trainCars.length; i++) {
         let ground = trainCars[i]
-        while (ground.isOverPoint(avatar.bottomL())) {
+        while (ground.isOverPoint(avatar.bottomL()) && !avatar.falling) {
             avatar.vy = 0;
             avatar.y--;
             offset.y--;
@@ -201,6 +228,14 @@ function game() {
         }
     }
 
+    if (avatar.bottomL().y > voidLevel) {
+        avatar.falling = true
+    } else {
+       avatar.falling = false
+    }
+
+ 
+ 
 
     for (let i = 0; i < platforms.length; i++) {
         let platform = platforms[i]
@@ -214,11 +249,12 @@ function game() {
 
     }
 
-    /* while (wall.isOverPoint(avatar.right()) && avatar.vx >= 0) {
-         avatar.vx = 0;
-         avatar.x--;
-         offset.x--;
-     }*/
+    //while ((signal.isOverPoint(avatar.bottomL()) || signal.isOverPoint(avatar.bottomR())) && state==game && avatar.vx >= 0) {
+
+    // avatar.vx = 0;
+    // avatar.x--;
+    // offset.x--;
+    // }
 
     /*-------Level movement threshold----*/
     //if(avatar.x > 500 || avatar.x < 300)
@@ -240,44 +276,57 @@ function game() {
     avatar.y += dy * .15;
 
     //----------------------------/
+    signal.x -= trainSpeed / 150
+
+    let signalX = (signal.x + level.x) * (signalPasses + 1)
+    if (signalX < 0) {
+        signalPasses++;
+        signal.x += c.width
+    }
 
     for (let i = 0; i < mountainArray1.length; i++) {
-        mtnOffset -= trainSpeed*.001
+        mtnOffset0 -= trainSpeed * .0005
         let mtn1 = mountainArray1[i]
 
         let mtn1End = mtn1.x + level.x + (mtn1.w / 2)
 
-        mtn1.x = (spot) + (-level.x + mtnOffset + (mtn1.w * i))
+        mtn1.x = (spot0) + (-level.x + mtnOffset0 + (mtn1.w * i)) - (mtn1.w / 4)
 
-        if (i == 1) console.log()
         if (mtn1End - mtn1.w < 0) {
-            if (i == 1 && !done) {
-                done = true
-                spot += (mtn1.w * (mountainArray1.length - 1))
-                console.log("hi")
+            if (i == 1 && !done0) {
+                done0 = true
+                spot0 += (mtn1.w * (mountainArray1.length - 1))
             }
-            if (i == 0) {
-            }
-            //mtn1.x += spot
+
         } else {
-
-
-            done = false
+            done0 = false
         }
 
+        mtn1.renderImage(document.getElementById("Mountain1"), true)
 
-        /* let mtn2 = mountainArray2[i]
-         mtn2.x = -level.x + (mtnOffset/2)
- 
-         let mtn2End = mtn2.x + (mtn2.w / 2)
-         if (mtn2End + level.x < 0) {
-             let spot = (mtn2.w * mountainArray2.length)
-             mtn2.x += spot-1
-         }*/
 
-        mtn1.renderImage(document.getElementById("Mountain1"))
-        // mtn2.renderImage(document.getElementById("Mountain1"))
     }
+    for (let i = 0; i < mountainArray2.length; i++) {
+        mtnOffset1 -= trainSpeed * .001
+
+        let mtn2 = mountainArray2[i]
+
+        let mtn2End = mtn2.x + level.x + (mtn2.w / 2)
+
+        mtn2.x = (spot1) + (-level.x + mtnOffset1 + (mtn2.w * i))
+
+        if (mtn2End - mtn2.w < 0) {
+            if (i == 1 && !done1) {
+                done1 = true
+                spot1 += (mtn2.w * (mountainArray2.length - 1))
+            }
+        } else {
+            done1 = false
+        }
+        mtn2.renderImage(document.getElementById("Mountain2"))
+
+    }
+
     for (let i = 0; i < bushesArray.length; i++) {
         // if (bushesArray[i]) {
 
@@ -306,15 +355,18 @@ function game() {
         }
 
 
-
         car.renderImage(document.getElementById("Container" + String(car.containerId)));
     }
 
-
     //wall.render();
     avatar.render();
+    signal.render();
+
+    //WIN / LOSE CONDITIONS
+    if (avatar.overlaps(signal) || avatar.y > c.height || avatar.x + avatar.w < 0 || avatar.x - avatar.w > c.width) state = lose;
 
 }
+
 
 
 
