@@ -90,6 +90,8 @@ let done1 = false
 let signalPasses = 0
 let signal = null
 let accel = 0
+let currentCar = null
+let score = 0
 
 
 for (let i = 0; i < platformsData.length; i++) {
@@ -125,6 +127,8 @@ function init() {
         trainCars[i] = car
     }
 
+    currentCar = trainCars[0]
+
     for (let i = 0; i < 2; i++) {
         let bushes = new GameObject();
         // bushes.color = `black`;
@@ -154,12 +158,14 @@ function init() {
         mountainArray2[i] = mountain2
     }
 
+
+
     signal = new GameObject();
     signal.color = "black"
-    signal.w = 18
-    signal.h = 150
+    signal.w = 18*3
+    signal.h = 150*3    
     signal.x = c.width
-    signal.y = c.height - (signal.h / 2)
+    signal.y = c.height+(signal.h/9) 
     signal.world = level
 
 }
@@ -217,10 +223,15 @@ function game() {
     
     let carOffset = trainCars[1].y-c.height + (trainCars[1].h/2)
     let voidLevel = c.height-(trainCars[1].h) + carOffset + 2
-    console.log(avatar.falling)
     for (let i = 0; i < trainCars.length; i++) {
         let ground = trainCars[i]
         while (ground.isOverPoint(avatar.bottomL()) && !avatar.falling) {
+           // console.log(ground.x , currentCar.x)
+            if (currentCar != ground && ground.x > currentCar.x){
+                currentCar = ground
+                score ++
+                console.log(score)
+            }
             avatar.vy = 0;
             avatar.y--;
             offset.y--;
@@ -235,7 +246,7 @@ function game() {
        avatar.falling = false
     }
 
- 
+    //console.log(score)
  
 
     for (let i = 0; i < platforms.length; i++) {
@@ -328,6 +339,10 @@ function game() {
 
     }
 
+    ctx.globalAlpha = 1
+    ctx.drawImage(document.getElementById("Sky"), 0, 0, c.width, c.height)
+    ctx.globalAlpha = 1
+
     for (let i = 0; i < bushesArray.length; i++) {
         // if (bushesArray[i]) {
 
@@ -361,8 +376,12 @@ function game() {
 
     //wall.render();
     avatar.render();
-    signal.render();
+    signal.renderImage(document.getElementById("Signal"));
 
+
+
+    ctx.font = "30px Gotham Black"
+    ctx.fillText(score, 20, 40, 1000)
     //WIN / LOSE CONDITIONS
     if (avatar.overlaps(signal) || avatar.y > c.height || avatar.x + avatar.w < 0 || avatar.x - avatar.w > c.width) state = lose;
 
