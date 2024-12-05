@@ -76,8 +76,9 @@ var signals = [];
 
 
 var numCars = 3
-var carSpacing = 30
-var maxTrainSpeed = 120
+var carSpacing = 30 //25-35
+var maxTrainSpeed = 120 //90-130
+var signalRarity = 2 //1-3
 
 let playerSpeed = (maxTrainSpeed) / 110
 let trainSpeed = 0
@@ -212,7 +213,7 @@ function game() {
         avatar.y += 25 / 2
         avatar.vx *= .7
     } else {
-        avatar.h = 50
+        avatar.h = 35
         accel = playerSpeed
     }
 
@@ -230,7 +231,6 @@ function game() {
             if (currentCar != ground && ground.x > currentCar.x){
                 currentCar = ground
                 score ++
-                console.log(score)
             }
             avatar.vy = 0;
             avatar.y--;
@@ -268,16 +268,6 @@ function game() {
     // offset.x--;
     // }
 
-    /*-------Level movement threshold----*/
-    //if(avatar.x > 500 || avatar.x < 300)
-    //{
-    //Level movement code
-    //level.x -= offset.x;
-    //avatar.x -= offset.x;
-    //level.y -= offset.y;
-    //avatar.y -= offset.y;
-    //}
-
     //----- Camera Code -----------
     var dx = -trainSpeed//c.width / 2 - avatar.x
     var dy = 0//c.height / 2 - avatar.y
@@ -293,7 +283,7 @@ function game() {
     let signalX = (signal.x + level.x) * (signalPasses + 1)
     if (signalX < 0) {
         signalPasses++;
-        signal.x += c.width
+        signal.x += c.width * ((Math.random()*signalRarity)+1)
     }
 
     for (let i = 0; i < mountainArray1.length; i++) {
@@ -375,7 +365,7 @@ function game() {
     }
 
     //wall.render();
-    avatar.render();
+    avatar.renderImage(document.getElementById("Cone"));
     signal.renderImage(document.getElementById("Signal"));
 
 

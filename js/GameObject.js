@@ -10,7 +10,7 @@ class GameObject
      this.angle = 0;
      //object dimensions
      this.w=20;
-     this.h=50;
+     this.h=35;
      //object velocity
      this.vx=0;
      this.vy=0;
@@ -109,11 +109,11 @@ class GameObject
     }
     bottomL()
     {
-        return {x:this.x-this.w/8, y:this.y + this.h/2};
+        return {x:this.x-this.w/2, y:this.y + this.h/2 - 1};
     }
     bottomR()
     {
-        return {x:this.x+this.w/8, y:this.y + this.h/2};
+        return {x:this.x+this.w/2, y:this.y + this.h/2 -1};
     }
     left()
     {
