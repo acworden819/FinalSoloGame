@@ -9,8 +9,8 @@ class GameObject
      //object angle
      this.angle = 0;
      //object dimensions
-     this.w=20;
-     this.h=35;
+     this.w=20*1.5;
+     this.h=35*1.5;
      //object velocity
      this.vx=0;
      this.vy=0;

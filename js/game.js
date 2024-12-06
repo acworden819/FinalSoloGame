@@ -17,15 +17,6 @@ var ground = new GameObject();
 var wall = new GameObject();
 var level = new GameObject();
 
-const carColors = [
-    "#e55036",
-    "#46ac13",
-    "#417caa",
-    "#8cab25",
-    "#ac8752",
-    "#a69bb2",
-    "#9bb2a5",
-]
 
 ctx.globalAlpha = 1
 
@@ -38,34 +29,6 @@ function randomCarColor() {
 }
 
 var translatedY = c.height + ground.h - ground.y;
-var platformsData = [
-    /* {
-         w: 200,
-         h: 34,
-         x: 200,
-         y: translatedY-(180*1),
-         color: `tan`,
-         world: level,
-     },
-     {
-         w: 200,
-         h: 34,
-         x: 200,
-         y: translatedY-(180*2),
-         color: `tan`,
-         world: level,
-     },
-     {
-         w: 200,
-         h: 34,
-         x: 200,
-         y: translatedY-(180*3),
-         color: `tan`,
-         world: level,
-     },*/
-
-
-];
 
 var platforms = [];
 var trainCars = [];
@@ -73,12 +36,16 @@ var bushesArray = [];
 var mountainArray1 = [];
 var mountainArray2 = [];
 var signals = [];
-
+var birds = [];
 
 var numCars = 3
 var carSpacing = 30 //25-35
 var maxTrainSpeed = 120 //90-130
 var signalRarity = 2 //1-3
+var playerSize = {w: 35, h:50}
+var numBirds = 4 // 4
+var birdRarity = 9 //9
+var birdSpeed = 7 //
 
 let playerSpeed = (maxTrainSpeed) / 110
 let trainSpeed = 0
@@ -93,18 +60,39 @@ let signal = null
 let accel = 0
 let currentCar = null
 let score = 0
+let lastBird = null
+
+const carColors = [
+    "#e55036",
+    "#46ac13",
+    "#417caa",
+    "#8cab25",
+    "#ac8752",
+    "#a69bb2",
+    "#9bb2a5",
+]
 
 
-for (let i = 0; i < platformsData.length; i++) {
-    var platform = new GameObject();
-    var pData = platformsData[i]
-    platform.w = pData.w
-    platform.h = pData.h
-    platform.x = pData.x
-    platform.y = pData.y
-    platform.color = pData.color
-    platform.world = pData.world
-    platforms[i] = platform
+function randomBirdX(){
+    let birdPos = (rand(0, birdRarity)*(c.width/3))
+    return birdPos
+}
+function randomBirdY(){
+    let birdPos = rand(200,c.height*.75)
+    return birdPos
+}
+for (let i = 0; i < numBirds; i++) {
+    var bird = new GameObject();
+    bird.w = 20
+    bird.h = 20
+    let lastX = 0
+    if (birds.length > 0) lastX = birds[birds.length-1].x
+    bird.x = c.width+(i*((birdRarity*(c.width/3))+randomBirdX()))
+    bird.y = randomBirdY()
+    bird.color = "red"
+    bird.world = level
+    birds[i] = bird
+    birds[i].passes = 0
 }
 
 
@@ -112,6 +100,8 @@ function init() {
     state = menu
 
     avatar.color = `blue`;
+    avatar.w = playerSize.w
+    avatar.h = playerSize.h
 
     level.x = 0;
     level.y = 0;
@@ -209,11 +199,11 @@ function game() {
     avatar.vy += 1.3;
 
     if (ctrl == true && avatar.canJump) {
-        avatar.h = 25
+        avatar.h = playerSize.h/2
         avatar.y += 25 / 2
         avatar.vx *= .7
     } else {
-        avatar.h = 35
+        avatar.h = playerSize.h
         accel = playerSpeed
     }
 
@@ -233,7 +223,8 @@ function game() {
                 score ++
             }
             avatar.vy = 0;
-            avatar.y--;
+
+            avatar.y-= .2;
             offset.y--;
             avatar.canJump = true;
         }
@@ -246,27 +237,6 @@ function game() {
        avatar.falling = false
     }
 
-    //console.log(score)
- 
-
-    for (let i = 0; i < platforms.length; i++) {
-        let platform = platforms[i]
-        while (platform.isOverPoint(avatar.bottomL()) || platform.isOverPoint(avatar.bottomR()) && avatar.vy >= 0) {
-            avatar.vy = 0;
-            avatar.y--;
-            offset.y--;
-            avatar.canJump = true
-        }
-        platform.render();
-
-    }
-
-    //while ((signal.isOverPoint(avatar.bottomL()) || signal.isOverPoint(avatar.bottomR())) && state==game && avatar.vx >= 0) {
-
-    // avatar.vx = 0;
-    // avatar.x--;
-    // offset.x--;
-    // }
 
     //----- Camera Code -----------
     var dx = -trainSpeed//c.width / 2 - avatar.x
@@ -278,6 +248,8 @@ function game() {
     avatar.y += dy * .15;
 
     //----------------------------/
+
+
     signal.x -= trainSpeed / 150
 
     let signalX = (signal.x + level.x) * (signalPasses + 1)
@@ -368,7 +340,21 @@ function game() {
     avatar.renderImage(document.getElementById("Cone"));
     signal.renderImage(document.getElementById("Signal"));
 
+    for (let i = 0; i < birds.length; i++) {
+        let bird = birds[i]
+        bird.x -= birdSpeed
+        if (bird.x+level.x < 0){
+            if(lastBird == null) lastBird = [birds.length-1]
+            bird.x = (birds[lastBird].x)  + (birdRarity*(c.width/3)) + randomBirdX()
+            bird.y = randomBirdY() 
+            lastBird = i
+        }
 
+        bird.render();
+        
+        if (avatar.overlaps(bird) || avatar.y > c.height || avatar.x + avatar.w < 0 || avatar.x - avatar.w > c.width) state = lose;
+
+    }
 
     ctx.font = "30px Gotham Black"
     ctx.fillText(score, 20, 40, 1000)
