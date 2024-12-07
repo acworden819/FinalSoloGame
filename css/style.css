@@ -8,6 +8,7 @@ body{
     align-items: flex-start;
     margin: 0;
     overflow: hidden;
+    background-color: black;
 }
 canvas{
     border:2px solid black;
