@@ -47,6 +47,7 @@ var playerSize = { w: window.innerWidth / 30, h: window.innerWidth / screenRatio
 var numBirds = 4 // 4
 var birdRarity = (window.innerWidth / 1050) * 6  //6
 var birdSpeed = maxTrainSpeed / 22 //
+var winningCar = 113
 
 let playerSpeed = (maxTrainSpeed) / 110
 let trainSpeed = 0
@@ -60,7 +61,7 @@ let signalPasses = 0
 let signal = null
 let accel = 0
 let currentCar = null
-let score = 0
+let score = 1
 let lastBird = null
 
 state = menu
@@ -131,6 +132,7 @@ function init() {
         car.y = c.height - (car.h / 2) + (c.height / 20)
         car.world = level
         car.containerId = randomCarColor()
+        car.stepped = false
         trainCars[i] = car
     }
 
@@ -244,7 +246,35 @@ function menu() {
 }
 
 function win() {
+    document.getElementById("canvas").style.backgroundColor = "black"
+    ctx.fillStyle = "lime"
+    ctx.font = "bold " + String(c.width / 45) + "px" + " Trebuchet MS"
 
+    button.color = "#1a1a1a"
+    button.x = c.width / 2
+    button.y = c.height * .65
+    button.w = c.width / 10
+    button.h = button.w / 2.8
+
+    let lineHeight = c.width / 23
+    let yPos = c.width / 4.5
+    ctx.textAlign = "center"
+    ctx.fillText("YOU WIN", c.width / 2, yPos)
+    ctx.fillStyle = "white"
+    ctx.font = "bold " + String(c.width / 70) + "px" + " Trebuchet MS"
+
+    ctx.fillText("You jump off the back of the train onto the tracks and make it home safely.", c.width / 2, yPos + lineHeight)
+    ctx.fillText("Play again?", c.width / 2, yPos + (lineHeight*2))
+
+    if (clicked(button)) {
+        resetGame()
+    }
+    if (doReset) {
+        doReset = false
+        resetGame()
+    }
+    button.render()
+    ctx.fillText("REPLAY", button.x, button.y + (button.h / 10))
 }
 function lose() {
 
@@ -461,11 +491,15 @@ function game() {
 
     }
     ctx.fillStyle = "black"
-    ctx.font = "30px Gotham Black"
-    ctx.fillText(score, 20, 40, 1000)
+    let size =  String(c.width / 30)
+    ctx.font = size + "px" + " Gotham Black"
+    ctx.textAlign = "left"
+    ctx.fillText(score, size/4, size, 1000)
     //WIN / LOSE CONDITIONS
     if (avatar.overlaps(signalObject) || avatar.y > c.height || avatar.x + avatar.w < 0 || avatar.x - avatar.w > c.width) state = lose; ; doReset = false; sp = false
-
+    if(score >= winningCar){
+        state = win; doReset = false; sp = false
+    }
 }
 
 
