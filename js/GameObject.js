@@ -21,6 +21,7 @@ class GameObject
     this.falling = false;
     this.world = {x:0, y:0}
     this.containerId = 0
+    this.stepped = false
 
 
      this.img = {

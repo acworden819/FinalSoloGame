@@ -20,7 +20,6 @@ var level = new GameObject();
 
 ctx.globalAlpha = 1
 
-
 function randomCarColor() {
     let randNum = rand(0, 5)
     // let color = carColors[randNum]
@@ -40,12 +39,12 @@ var birds = [];
 
 var numCars = 3
 var carSpacing = 30 //25-35
-var maxTrainSpeed = 120 //90-130
+var maxTrainSpeed = window.innerHeight/4 //90-130
 var signalRarity = 2 //1-3
-var playerSize = {w: 35, h:50}
+var playerSize = {w: window.innerWidth/30, h:window.innerHeight/12}
 var numBirds = 4 // 4
-var birdRarity = 9 //9
-var birdSpeed = 7 //
+var birdRarity = 15 //9
+var birdSpeed = maxTrainSpeed/13 //
 
 let playerSpeed = (maxTrainSpeed) / 110
 let trainSpeed = 0
@@ -78,13 +77,13 @@ function randomBirdX(){
     return birdPos
 }
 function randomBirdY(){
-    let birdPos = rand(200,c.height*.75)
+    let birdPos = rand(window.innerHeight*.2,window.innerHeight*.75)
     return birdPos
 }
 for (let i = 0; i < numBirds; i++) {
     var bird = new GameObject();
-    bird.w = 20
-    bird.h = 20
+    bird.h = window.innerHeight/15
+    bird.w = bird.h
     let lastX = 0
     if (birds.length > 0) lastX = birds[birds.length-1].x
     bird.x = c.width+(i*((birdRarity*(c.width/3))+randomBirdX()))
@@ -97,7 +96,11 @@ for (let i = 0; i < numBirds; i++) {
 
 
 function init() {
+    c.width = window.innerWidth
+    c.height = window.innerHeight//1.869837296620776
+    //console.log(window.innerWidth/window.innerHeight)
     state = menu
+   
 
     avatar.color = `blue`;
     avatar.w = playerSize.w
@@ -119,14 +122,14 @@ function init() {
     }
 
     currentCar = trainCars[0]
-
+    trainCars[0].stepped = true
     for (let i = 0; i < 2; i++) {
         let bushes = new GameObject();
         // bushes.color = `black`;
         bushes.w = (c.width * 2);
-        bushes.h = 600;
+        bushes.h = bushes.w*.4;
         bushes.x = ((bushes.w) / 2) + (((bushes.w)) * i)
-        bushes.y = 250 //c.height - (bushes.h / 2) + 20
+        bushes.y = c.height/2.5 //c.height - (bushes.h / 2) + 20
         bushes.world = level
         //bushes.containerId = randomCarColor()
         bushesArray[i] = bushes
@@ -134,17 +137,17 @@ function init() {
     for (let i = 0; i < 2; i++) {
         let mountain = new GameObject();
         mountain.w = (c.width * 2);
-        mountain.h = 300;
+        mountain.h = mountain.w/4;
         mountain.x = ((mountain.w) / 2) + ((((mountain.w)) * i))
-        mountain.y = 200//c.height - (bushes.h / 2) + 20
+        mountain.y = c.height/3.5//c.height - (bushes.h / 2) + 20
         mountain.world = level
         mountainArray1[i] = mountain
 
         let mountain2 = new GameObject();
         mountain2.w = (c.width * 2);
-        mountain2.h = 400;
+        mountain2.h = mountain.w/3.5;
         mountain2.x = ((mountain2.w) / 2) + ((((mountain2.w)) * i))
-        mountain2.y = 200//c.height - (bushes.h / 2) + 20
+        mountain2.y = c.height/3.5//c.height - (bushes.h / 2) + 20
         mountain2.world = level
         mountainArray2[i] = mountain2
     }
@@ -153,8 +156,8 @@ function init() {
 
     signal = new GameObject();
     signal.color = "black"
-    signal.w = 18*3
-    signal.h = 150*3    
+    signal.h = c.height/1.2
+    signal.w = signal.h/6.5
     signal.x = c.width
     signal.y = c.height+(signal.h/9) 
     signal.world = level
@@ -165,10 +168,36 @@ init();
 
 /*---------------Game Screens (states)----------------*/
 function menu() {
+    document.getElementById("canvas").style.backgroundColor = "black"
+    ctx.fillStyle = "white"
+    ctx.font = "bold 16px Trebuchet MS "
+
+    button.color = "#1a1a1a"
+    button.x = c.width/2
+    button.y = 350
+    button.w = 120
+    button.h = 50
+
+    let lineHeight = 35
+    let yPos = 120
+    ctx.textAlign = "center"
+    ctx.fillText("You are a newborn traffic cone.", c.width/2, yPos)
+    ctx.fillText("Afraid of loud noises, you run off from your first jobsite and hop onto a nearby train.", c.width/2, yPos+(1*lineHeight))
+    ctx.fillText("You soon realize you've made a grave mistake, this train is heading directly back to the jobsite.", c.width/2, yPos+(2*lineHeight))
+    ctx.fillText("It's too dangerous to jump, you have to hop off the back.", c.width/2, yPos+(3*lineHeight))
+   
+    ctx.fillText("Canadian freight trains carry about 114 cars on average.", c.width/2, yPos+(5*lineHeight))
+    // ctx.fillText("Lucky for you, this one is only 50 cars long.", c.width/2, yPos+(7*lineHeight))
+
+    //
+    //ctx.fillText("Canadian freight trains carry about 114 cars on average.", c.width/2, 200)
+
     if (clicked(button)) {
         state = game;
     }
     button.render()
+    ctx.fillText("PLAY", button.x, button.y+(button.h/10))
+
 }
 
 function win() {
@@ -179,16 +208,17 @@ function lose() {
 }
 
 function game() {
+    document.getElementById("canvas").style.backgroundColor = "#a6ceff"
 
     accel = playerSpeed
     if (trainSpeed <= maxTrainSpeed) trainSpeed += .25;
 
     if (sp == true && avatar.canJump == true) {
         avatar.canJump = false;
-        avatar.vy = -25;
+        avatar.vy = -playerSpeed*20;
     }
     if (a == true) {
-        avatar.vx += -accel;
+        avatar.vx += -accel;    
     }
     if (d == true) {
         avatar.vx += accel;
@@ -196,7 +226,7 @@ function game() {
 
 
     avatar.vx *= .85;
-    avatar.vy += 1.3;
+    avatar.vy += c.height/500;
 
     if (ctrl == true && avatar.canJump) {
         avatar.h = playerSize.h/2
@@ -218,7 +248,8 @@ function game() {
         let ground = trainCars[i]
         while (ground.isOverPoint(avatar.bottomL()) && !avatar.falling) {
            // console.log(ground.x , currentCar.x)
-            if (currentCar != ground && ground.x > currentCar.x){
+            if (currentCar != ground && !ground.stepped){
+                ground.stepped = true
                 currentCar = ground
                 score ++
             }
@@ -250,7 +281,7 @@ function game() {
     //----------------------------/
 
 
-    signal.x -= trainSpeed / 150
+    signal.x -= trainSpeed / 110
 
     let signalX = (signal.x + level.x) * (signalPasses + 1)
     if (signalX < 0) {
@@ -330,6 +361,7 @@ function game() {
             car.x += spot
             carColors.push(car.color)
             car.containerId = randomCarColor()
+            car.stepped = false
         }
 
 
@@ -355,7 +387,7 @@ function game() {
         if (avatar.overlaps(bird) || avatar.y > c.height || avatar.x + avatar.w < 0 || avatar.x - avatar.w > c.width) state = lose;
 
     }
-
+    ctx.fillStyle = "black"
     ctx.font = "30px Gotham Black"
     ctx.fillText(score, 20, 40, 1000)
     //WIN / LOSE CONDITIONS
