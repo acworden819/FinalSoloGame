@@ -40,20 +40,19 @@ var birds = [];
 
 var screenRatio = 1.7680473372781065
 var numCars = 3
-var carSpacing = window.innerWidth / 30 //25-35
-var maxTrainSpeed = window.innerWidth / 8 //90-130
+var carSpacing = 0
+var maxTrainSpeed = 0
 var signalRarity = 2 //1-3
-var playerSize = { w: window.innerWidth / 30, h: window.innerWidth / screenRatio / 12 }
 var numBirds = 4 // 4
-var birdRarity = (window.innerWidth / 1050) * 6  //6
-var birdSpeed = maxTrainSpeed / 25 //
+var birdRarity = 0
+var birdSpeed = 0
 var winningCar = 114
-
-let playerSpeed = (maxTrainSpeed) / 110
+var playerSize
+var playerSpeed
 let trainSpeed = 0
 let mtnOffset0 = 0
 let mtnOffset1 = 0
-let spot0 = 0
+let spot0 = 0   
 let done0 = false
 let spot1 = 0
 let done1 = false
@@ -87,8 +86,17 @@ function randomBirdY() {
 
 
 function init() {
+
     c.width = window.innerWidth
     c.height = window.innerWidth / screenRatio
+
+    carSpacing = window.innerWidth / 30 //25-35
+    maxTrainSpeed = window.innerWidth / 8 //90-130
+    birdRarity = (window.innerWidth / 1050) * 6  //6
+    birdSpeed = maxTrainSpeed / 25 //
+    playerSpeed = (maxTrainSpeed) / 110
+    
+    playerSize = { w: window.innerWidth / 30, h: window.innerWidth / screenRatio / 12 }
 
     avatar.color = `blue`;
     avatar.w = playerSize.w
