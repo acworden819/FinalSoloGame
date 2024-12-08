@@ -4,6 +4,7 @@ var fps = 1000 / 60
 var timer = setInterval(main, fps)
 
 function main() {
+    c.style.marginTop = String((window.innerHeight-c.height)/2)+"px"
     ctx.clearRect(0, 0, c.width, c.height);
     state()
 }
