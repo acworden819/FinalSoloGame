@@ -1,4 +1,3 @@
-
 var c = document.querySelector(`canvas`)
 var ctx = c.getContext(`2d`)
 var fps = 1000 / 60
@@ -17,6 +16,7 @@ var ground = new GameObject();
 var wall = new GameObject();
 var level = new GameObject();
 var signalObject = new GameObject();
+var sun = new GameObject();
 
 
 ctx.globalAlpha = 1
@@ -46,8 +46,8 @@ var signalRarity = 2 //1-3
 var playerSize = { w: window.innerWidth / 30, h: window.innerWidth / screenRatio / 12 }
 var numBirds = 4 // 4
 var birdRarity = (window.innerWidth / 1050) * 6  //6
-var birdSpeed = maxTrainSpeed / 22 //
-var winningCar = 113
+var birdSpeed = maxTrainSpeed / 25 //
+var winningCar = 114
 
 let playerSpeed = (maxTrainSpeed) / 110
 let trainSpeed = 0
@@ -111,7 +111,7 @@ function init() {
         bird.w = bird.h
         let lastX = 0
         if (birds.length > 0) lastX = birds[birds.length - 1].x
-        bird.x = c.width + (i * ((birdRarity * (1000)) + randomBirdX()))
+        bird.x = c.width + ((i+1) * ((birdRarity * (1000)) + randomBirdX()))
         bird.y = randomBirdY()
         bird.color = "red"
         bird.world = level
@@ -149,7 +149,7 @@ function init() {
         bushes.w = (c.width * 2);
         bushes.h = bushes.w * .4;
         bushes.x = ((bushes.w) / 2) + (((bushes.w)) * i)
-        bushes.y = c.height / 2.5 //c.height - (bushes.h / 2) + 20
+        bushes.y = c.height / 2.1 //2.2
         bushes.world = level
         bushesArray[i] = bushes
 
@@ -165,7 +165,7 @@ function init() {
         mountain.w = (c.width * 2);
         mountain.h = mountain.w / 4;
         mountain.x = ((mountain.w) / 2) + ((((mountain.w)) * i))
-        mountain.y = c.height / 3.5//c.height - (bushes.h / 2) + 20
+        mountain.y = c.height / 3//c.height - (bushes.h / 2) + 20
         mountain.world = level
         mountainArray1[i] = mountain
 
@@ -178,7 +178,7 @@ function init() {
         mountain2.w = (c.width * 2);
         mountain2.h = mountain.w / 3.5;
         mountain2.x = ((mountain2.w) / 2) + ((((mountain2.w)) * i))
-        mountain2.y = c.height / 3.5//c.height - (bushes.h / 2) + 20
+        mountain2.y = c.height / 3//c.height - (bushes.h / 2) + 20
         mountain2.world = level
         mountainArray2[i] = mountain2
 
@@ -194,6 +194,12 @@ function init() {
     signalObject.y = c.height + (signalObject.h / 9)
     signalObject.world = level
 
+    sun.h = c.height/3
+    sun.w = sun.h
+    sun.x = c.width*.9
+    sun.y = c.height*.13
+
+
     ctx.imageSmoothingEnabled = true
 }
 
@@ -203,7 +209,7 @@ function resetGame() {
     state = game;
     ctx.clearRect(c.width / 2, c.height / 2, c.width, c.height)
     init()
-    score = 0
+    score = 1
     avatar.vx = 0
     avatar.vy = 0
     avatar.canJump = false
@@ -226,7 +232,7 @@ function menu() {
     let lineHeight = c.width / 40
     let yPos = c.width / 5.5
     ctx.textAlign = "center"
-    ctx.fillText("You are a newborn traffic cone.", c.width / 2, yPos)
+    ctx.fillText("You are a newborn traffic cone in Canada.", c.width / 2, yPos)
     ctx.fillText("Afraid of loud noises, you run off from your first jobsite and hop onto a nearby train.", c.width / 2, yPos + (1 * lineHeight))
     ctx.fillText("You soon realize you've made a grave mistake, this train is heading directly back to the jobsite.", c.width / 2, yPos + (2 * lineHeight))
     ctx.fillText("It's too dangerous to jump, you have to hop off the back.", c.width / 2, yPos + (3 * lineHeight))
@@ -264,7 +270,7 @@ function win() {
     ctx.font = "bold " + String(c.width / 70) + "px" + " Trebuchet MS"
 
     ctx.fillText("You jump off the back of the train onto the tracks and make it home safely.", c.width / 2, yPos + lineHeight)
-    ctx.fillText("Play again?", c.width / 2, yPos + (lineHeight*2))
+    ctx.fillText("Play again?", c.width / 2, yPos + (lineHeight * 2))
 
     if (clicked(button)) {
         resetGame()
@@ -314,7 +320,6 @@ function game() {
 
     accel = playerSpeed
     if (trainSpeed <= maxTrainSpeed) trainSpeed += (maxTrainSpeed / 250);
-
     if (sp == true && avatar.canJump == true) {
         avatar.canJump = false;
         avatar.vy = -playerSpeed * 20;
@@ -345,11 +350,10 @@ function game() {
     var offset = { x: avatar.vx, y: avatar.vy }
 
     let carOffset = trainCars[1].y - c.height + (trainCars[1].h / 2)
-    let voidLevel = c.height - (trainCars[1].h) + carOffset + 2
+    let voidLevel = c.height - (trainCars[1].h) + carOffset + 3
     for (let i = 0; i < trainCars.length; i++) {
         let ground = trainCars[i]
         while (ground.isOverPoint(avatar.bottomL()) && !avatar.falling) {
-            // console.log(ground.x , currentCar.x)
             if (currentCar != ground && !ground.stepped) {
                 ground.stepped = true
                 currentCar = ground
@@ -383,10 +387,10 @@ function game() {
     //----------------------------/
 
 
-    signalObject.x -= trainSpeed / 110
+    signalObject.x -= trainSpeed / 100
 
     let signalX = (signalObject.x + level.x) * (signalPasses + 1)
-    if (signalX < 0) {
+    if (signalX < -signalObject.w) {
         signalPasses++;
         signalObject.x += c.width * ((Math.random() * signalRarity) + 1)
     }
@@ -436,7 +440,8 @@ function game() {
 
     ctx.globalAlpha = 1
     ctx.drawImage(document.getElementById("Sky"), 0, 0, c.width, c.height)
-    ctx.globalAlpha = 1
+    ctx.globalAlpha = 1 
+    sun.renderImage(document.getElementById("Sun"))
 
     for (let i = 0; i < bushesArray.length; i++) {
         // if (bushesArray[i]) {
@@ -478,7 +483,7 @@ function game() {
         let bird = birds[i]
         bird.x -= birdSpeed
         if (bird.x + level.x < c.width) bird.y += birdSpeed / 30
-        if (bird.x + level.x < 0) {
+        if (bird.x + level.x < -bird.w) {
             if (lastBird == null) lastBird = [birds.length - 1]
             bird.x = (birds[lastBird].x) + (birdRarity * (1000)) + randomBirdX()
             bird.y = randomBirdY()
@@ -487,17 +492,20 @@ function game() {
 
         bird.renderImage(document.getElementById("Eagle"));
 
-        if (avatar.overlaps(bird) || avatar.y > c.height || avatar.x + avatar.w < 0 || avatar.x - avatar.w > c.width) state = lose; doReset = false; sp = false
-
+        if (avatar.overlaps(bird) || avatar.y > c.height || avatar.x + avatar.w < 0 || avatar.x - avatar.w > c.width) {
+            state = lose; doReset = false; sp = false
+        }
     }
     ctx.fillStyle = "black"
-    let size =  String(c.width / 30)
+    let size = String(c.width / 30)
     ctx.font = size + "px" + " Gotham Black"
     ctx.textAlign = "left"
-    ctx.fillText(score, size/4, size, 1000)
+    ctx.fillText(score + " / " + winningCar, size / 4, size, 1000)
     //WIN / LOSE CONDITIONS
-    if (avatar.overlaps(signalObject) || avatar.y > c.height || avatar.x + avatar.w < 0 || avatar.x - avatar.w > c.width) state = lose; ; doReset = false; sp = false
-    if(score >= winningCar){
+    if (avatar.overlaps(signalObject) || avatar.y > c.height || avatar.x + avatar.w < 0 || avatar.x - avatar.w > c.width) {
+        state = lose;; doReset = false; sp = false
+    }
+    if (score >= winningCar) {
         state = win; doReset = false; sp = false
     }
 }

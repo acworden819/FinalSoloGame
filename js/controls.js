@@ -34,8 +34,8 @@ function release(e)
     if(e.keyCode == 68){d = false;}
     if(e.keyCode == 32){
         if(sp) doReset = true;
-       }
         sp = false;
+       }
         
     if(e.keyCode == 16){ctrl = false;}
 }
