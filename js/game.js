@@ -24,8 +24,6 @@ ctx.globalAlpha = 1
 
 function randomCarColor() {
     let randNum = rand(0, 5)
-    // let color = carColors[randNum]
-    //carColors.splice(randNum, 1)
     return randNum
 }
 
@@ -115,7 +113,6 @@ function init() {
         } else {
             bird = new GameObject();
         }
-        //bird = birds[i]
         bird.h = c.height / 9
         bird.w = bird.h
         let lastX = 0
@@ -154,7 +151,6 @@ function init() {
         } else {
             bushes = new GameObject();
         }
-        // bushes.color = `black`;
         bushes.w = (c.width * 2);
         bushes.h = bushes.w * .4;
         bushes.x = ((bushes.w) / 2) + (((bushes.w)) * i)
@@ -162,7 +158,6 @@ function init() {
         bushes.world = level
         bushesArray[i] = bushes
 
-        //bushes.containerId = randomCarColor()
     }
     for (let i = 0; i < 2; i++) {
         let mountain = null
@@ -247,10 +242,6 @@ function menu() {
     ctx.fillText("It's too dangerous to jump, you have to hop off the back.", c.width / 2, yPos + (3 * lineHeight))
 
     ctx.fillText("Canadian freight trains carry about 114 cars on average.", c.width / 2, yPos + (5 * lineHeight))
-    // ctx.fillText("Lucky for you, this one is only 50 cars long.", c.width/2, yPos+(7*lineHeight))
-
-    //
-    //ctx.fillText("Canadian freight trains carry about 114 cars on average.", c.width/2, 200)
 
     if (clicked(button)) {
         state = game;
@@ -453,7 +444,6 @@ function game() {
     sun.renderImage(document.getElementById("Sun"))
 
     for (let i = 0; i < bushesArray.length; i++) {
-        // if (bushesArray[i]) {
 
         let bush = bushesArray[i]
         bush.x -= trainSpeed / 150
@@ -484,7 +474,6 @@ function game() {
         car.renderImage(document.getElementById("Container" + String(car.containerId)));
     }
 
-    //wall.render();
     avatar.renderImage(document.getElementById("Cone"));
     signalObject.renderImage(document.getElementById("Signal"));
 
@@ -509,7 +498,7 @@ function game() {
     let size = String(c.width / 30)
     ctx.font = size + "px" + " Gotham Black"
     ctx.textAlign = "left"
-    let margin = c.height-window.innerHeight+Number(size)//((c.height-(window.innerHeight))/4)
+    let margin = c.height-window.innerHeight+Number(size)
     console.log(window.innerHeight, c.height)
     let screenMargin = ((window.innerHeight-c.height)/2)
     if (window.innerWidth/window.innerHeight > screenRatio) screenMargin = 0;
