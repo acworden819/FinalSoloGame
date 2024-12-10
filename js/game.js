@@ -509,7 +509,11 @@ function game() {
     let size = String(c.width / 30)
     ctx.font = size + "px" + " Gotham Black"
     ctx.textAlign = "left"
-    ctx.fillText(score + " / " + winningCar, size / 4, size, 1000)
+    let margin = c.height-window.innerHeight+Number(size)//((c.height-(window.innerHeight))/4)
+    console.log(window.innerHeight, c.height)
+    let screenMargin = ((window.innerHeight-c.height)/2)
+    if (window.innerWidth/window.innerHeight > screenRatio) screenMargin = 0;
+    ctx.fillText(score + " / " + winningCar, size / 4, margin+(screenMargin*2), 1000)
     //WIN / LOSE CONDITIONS
     if (avatar.overlaps(signalObject) || avatar.y > c.height || avatar.x + avatar.w < 0 || avatar.x - avatar.w > c.width) {
         state = lose;; doReset = false; sp = false
